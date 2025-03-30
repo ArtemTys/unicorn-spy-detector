@@ -115,6 +115,9 @@ function overrideVisibilityProperties() {
 /**
  * Симулирует активность пользователя для обхода систем отслеживания
  */
+/**
+ * Симулирует активность пользователя для обхода систем отслеживания
+ */
 function simulateMouseActivity() {
   if (!protectionEnabled) return;
   
@@ -154,23 +157,7 @@ function simulateMouseActivity() {
       fireMouseEvent(lastX, lastY);
     }
     
-    // Случайные клики (примерно в 10% случаев)
-    if (Math.random() < 0.1) {
-      setTimeout(() => {
-        const clickEvent = new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true,
-          view: window,
-          clientX: lastX,
-          clientY: lastY
-        });
-        
-        const element = document.elementFromPoint(lastX, lastY);
-        if (element && !element.matches('input, textarea, select, button, a')) {
-          element.dispatchEvent(clickEvent);
-        }
-      }, 100 + Math.random() * 200);
-    }
+    // Убраны случайные клики мышкой
   }, 5000 + Math.random() * 10000);
   
   /**
