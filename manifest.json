@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Unicorn Spy Detector",
+  "version": "1.0.1",
+  "description": "Защищает от слежки за активностью в браузере, блокирует отслеживание вкладок и буфера обмена",
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content-script.js"],
+    "run_at": "document_start",
+    "all_frames": true
+  }],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/48.png"
+  },
+  "author": "Artem Tysiatskii",
+  "homepage_url": "https://github.com/ArtemTys/unicorn-spy-detector"
+}
