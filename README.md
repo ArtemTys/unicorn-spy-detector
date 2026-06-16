@@ -84,4 +84,3 @@ unicorn-spy-detector/
 ## 📄 License
 
 MIT © [Artem Tysiatskii](https://github.com/TemaTys)
-````
