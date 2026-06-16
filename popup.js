@@ -1,52 +1,35 @@
 /**
- * Unicorn Spy Detector - Popup Script
- * 
- * Управляет пользовательским интерфейсом всплывающего окна расширения
+ * Unicorn Spy Detector — Popup UI.
+ * Reads/writes settings in chrome.storage and reflects live stats.
  */
 
-// Версия расширения
-const VERSION = '1.0.1';
+const $ = (id) => document.getElementById(id);
 
-// Обработчик изменения состояния переключателя блокировки
-document.getElementById('blockTracking').addEventListener('change', (e) => {
-  chrome.storage.local.set({ blockTracking: e.target.checked });
-});
-
-// Обработчик кнопки сброса статистики
-document.getElementById('resetStats').addEventListener('click', () => {
-  chrome.storage.local.set({ 
-    trackingCount: 0,
-    lastTracking: null
-  });
-});
-
-/**
- * Загружает настройки из хранилища и обновляет интерфейс
- */
-function loadSettings() {
-  chrome.storage.local.get(
-    ['blockTracking', 'trackingCount', 'lastTracking', 'version'], 
-    (data) => {
-      // Применяем значения с проверкой на null/undefined
-      document.getElementById('blockTracking').checked = data.blockTracking ?? true;
-      document.getElementById('trackingCount').textContent = data.trackingCount || 0;
-      document.getElementById('lastTracking').textContent = data.lastTracking || '-';
-      
-      // Обновляем информацию о версии
-      document.getElementById('version').textContent = data.version || VERSION;
-    }
-  );
+function setStatus(on) {
+  $('toggle').checked = on;
+  $('status').textContent = on ? 'Protection on' : 'Protection off';
+  $('status').className = 'status ' + (on ? 'on' : 'off');
 }
 
-// Загружаем настройки при открытии popup
-loadSettings();
+chrome.storage.local.get(
+  { blockTracking: true, trackingCount: 0, lastTracking: null, version: chrome.runtime.getManifest().version },
+  (d) => {
+    setStatus(d.blockTracking);
+    $('count').textContent = d.trackingCount;
+    $('last').textContent = d.lastTracking || '—';
+    $('version').textContent = d.version;
+  }
+);
 
-// Обновляем информацию, когда хранилище изменяется
-chrome.storage.onChanged.addListener((changes) => {
-  if (changes.trackingCount) {
-    document.getElementById('trackingCount').textContent = changes.trackingCount.newValue || 0;
-  }
-  if (changes.lastTracking) {
-    document.getElementById('lastTracking').textContent = changes.lastTracking.newValue || '-';
-  }
+$('toggle').addEventListener('change', (e) =>
+  chrome.storage.local.set({ blockTracking: e.target.checked }));
+
+$('reset').addEventListener('click', () =>
+  chrome.storage.local.set({ trackingCount: 0, lastTracking: null }));
+
+chrome.storage.onChanged.addListener((c, area) => {
+  if (area !== 'local') return;
+  if (c.blockTracking) setStatus(c.blockTracking.newValue);
+  if (c.trackingCount) $('count').textContent = c.trackingCount.newValue || 0;
+  if (c.lastTracking) $('last').textContent = c.lastTracking.newValue || '—';
 });

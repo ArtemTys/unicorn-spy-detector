@@ -1,29 +1,34 @@
 {
   "manifest_version": 3,
   "name": "Unicorn Spy Detector",
-  "version": "1.0.1",
-  "description": "Защищает от слежки за активностью в браузере, блокирует отслеживание вкладок и буфера обмена",
-  "icons": {
-    "16": "icons/16.png",
-    "48": "icons/48.png",
-    "128": "icons/128.png"
-  },
-  "permissions": [
-    "storage"
+  "version": "1.1.0",
+  "description": "Stops websites from spying on your tab activity, focus, and clipboard. Stay private and bypass client-side proctoring scripts.",
+  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "permissions": ["storage"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["protector.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["bridge.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "ISOLATED"
+    }
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "content_scripts": [{
-    "matches": ["<all_urls>"],
-    "js": ["content-script.js"],
-    "run_at": "document_start",
-    "all_frames": true
-  }],
-  "action": {
-    "default_popup": "popup.html",
-    "default_icon": "icons/48.png"
+  "action": { "default_popup": "popup.html", "default_icon": "icons/48.png" },
+  "commands": {
+    "toggle-protection": {
+      "suggested_key": { "default": "Alt+Shift+U" },
+      "description": "Toggle protection on/off"
+    }
   },
   "author": "Artem Tysiatskii",
-  "homepage_url": "https://github.com/ArtemTys/unicorn-spy-detector"
+  "homepage_url": "https://github.com/TemaTys/unicorn-spy-detector"
 }

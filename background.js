@@ -1,30 +1,37 @@
 /**
- * Unicorn Spy Detector - Background Service Worker
- * 
- * Отвечает за инициализацию хранилища и обработку событий расширения
+ * Unicorn Spy Detector — Background service worker.
+ * Sets defaults on install, keeps the toolbar badge in sync and
+ * handles the keyboard shortcut that toggles protection.
  */
 
-// Версия расширения
-const VERSION = '1.0.1';
+const VERSION = chrome.runtime.getManifest().version;
+const DEFAULTS = { blockTracking: true, trackingCount: 0, lastTracking: null };
 
-// Инициализация хранилища при установке расширения
-chrome.runtime.onInstalled.addListener((details) => {
-  // Значения по умолчанию
-  const defaultSettings = { 
-    blockTracking: true, 
-    trackingCount: 0,
-    lastTracking: null,
-    installDate: new Date().toISOString(),
-    version: VERSION
-  };
+function paintBadge(on) {
+  chrome.action.setBadgeText({ text: on ? '' : 'OFF' });
+  chrome.action.setBadgeBackgroundColor({ color: '#6a1b9a' });
+  chrome.action.setBadgeTextColor?.({ color: '#ffffff' });
+}
 
-  // Установка значений по умолчанию
-  chrome.storage.local.set(defaultSettings);
+function syncBadge() {
+  chrome.storage.local.get({ blockTracking: true }, ({ blockTracking }) => paintBadge(blockTracking));
+}
 
-  // Вывод сообщения при первой установке
-  if (details.reason === 'install') {
-    console.log('Unicorn Spy Detector успешно установлен!');
-  } else if (details.reason === 'update') {
-    console.log(`Unicorn Spy Detector обновлен до версии ${VERSION}`);
-  }
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.get(DEFAULTS, (current) =>
+    chrome.storage.local.set({ ...current, version: VERSION }, syncBadge));
 });
+
+chrome.runtime.onStartup.addListener(syncBadge);
+
+chrome.commands.onCommand.addListener((command) => {
+  if (command !== 'toggle-protection') return;
+  chrome.storage.local.get({ blockTracking: true }, ({ blockTracking }) =>
+    chrome.storage.local.set({ blockTracking: !blockTracking }));
+});
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.blockTracking) paintBadge(changes.blockTracking.newValue);
+});
+
+syncBadge();

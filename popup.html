@@ -1,120 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <style>
-    body { 
-      width: 280px; 
-      padding: 15px; 
-      font-family: Arial, sans-serif; 
-      background-color: #2b2b2b;
-      color: #e0e0e0;
-      margin: 0;
-    }
-    .title { 
-      font-weight: bold; 
-      margin-bottom: 15px;
-      font-size: 18px;
-      text-align: center;
-    }
-    label { 
-      display: block; 
-      margin: 10px 0; 
-      cursor: pointer;
-    }
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 40px;
-      height: 20px;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #555;
-      transition: .3s;
-      border-radius: 20px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 2px;
-      bottom: 2px;
-      background-color: #ddd;
-      transition: .3s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: #6a1b9a;
-    }
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
-    .stats {
-      margin-top: 15px;
-      padding-top: 10px;
-      border-top: 1px solid #444;
-      font-size: 12px;
-    }
-    .stats div {
-      margin-bottom: 4px;
-    }
-    .footer {
-      margin-top: 15px;
-      font-size: 10px;
-      text-align: center;
-      color: #888;
-    }
-    .button {
-      background-color: #6a1b9a;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 11px;
-      margin-top: 10px;
-    }
-    .button:hover {
-      background-color: #8e24aa;
-    }
-    .center {
-      text-align: center;
-    }
-  </style>
+<meta charset="UTF-8">
+<style>
+  :root { --accent:#a855f7; --accent2:#6a1b9a; }
+  * { box-sizing:border-box; }
+  body{width:300px;margin:0;padding:18px;color:#ece8f2;
+    font-family:'Segoe UI',system-ui,Arial,sans-serif;
+    background:linear-gradient(160deg,#241b33,#15101f);}
+  .header{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+  .header span{font-size:24px;}
+  .header h1{margin:0;font-size:16px;font-weight:600;}
+  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+    border-radius:12px;padding:14px;margin-bottom:12px;}
+  .row{display:flex;align-items:center;justify-content:space-between;}
+  .status{font-size:14px;font-weight:600;}
+  .status.on{color:#c084fc;} .status.off{color:#8a8593;}
+  .switch{position:relative;width:46px;height:24px;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;inset:0;background:#4a4458;border-radius:24px;
+    transition:.3s;cursor:pointer;}
+  .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;
+    background:#fff;border-radius:50%;transition:.3s;}
+  input:checked + .slider{background:linear-gradient(90deg,var(--accent2),var(--accent));}
+  input:checked + .slider:before{transform:translateX(22px);}
+  .stat{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;color:#bdb8c7;}
+  .stat b{color:#ece8f2;font-weight:600;}
+  .reset{width:100%;margin-top:10px;padding:7px;border:none;border-radius:8px;cursor:pointer;
+    background:rgba(168,85,247,.15);color:#d8b4fe;font-size:12px;transition:.2s;}
+  .reset:hover{background:rgba(168,85,247,.28);}
+  .footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#7c7689;}
+  .footer a{color:#a855f7;text-decoration:none;}
+  kbd{background:#2c2440;border:1px solid #463a5e;border-radius:4px;padding:1px 5px;font-size:10px;}
+</style>
 </head>
 <body>
-  <div class="title">🦄 UniCorn Detector</div>
-  <label>
-    <span class="toggle-switch">
-      <input type="checkbox" id="blockTracking" checked>
-      <span class="slider"></span>
-    </span>
-    Блокировать слежку
-  </label>
-  <div class="stats">
-    <div>Блокировок: <span id="trackingCount">0</span></div>
-    <div>Последняя атака: <span id="lastTracking">-</span></div>
-    <div class="center">
-      <button id="resetStats" class="button">Сбросить статистику</button>
+  <div class="header"><span>🦄</span><h1>Unicorn Spy Detector</h1></div>
+
+  <div class="card">
+    <div class="row">
+      <span id="status" class="status on">Protection on</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle" checked>
+        <span class="slider"></span>
+      </label>
     </div>
   </div>
-  <div class="footer">
-    Версия <span id="version">1.0.1</span>
+
+  <div class="card">
+    <div class="stat"><span>Spying attempts blocked</span><b id="count">0</b></div>
+    <div class="stat"><span>Last attempt</span><b id="last">—</b></div>
+    <button id="reset" class="reset">Reset statistics</button>
   </div>
+
+  <div class="footer">
+    <span>v<span id="version">1.1.0</span> · <kbd>Alt+Shift+U</kbd></span>
+    <a href="https://github.com/TemaTys/unicorn-spy-detector" target="_blank">GitHub</a>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
